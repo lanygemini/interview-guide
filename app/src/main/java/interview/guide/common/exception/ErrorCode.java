@@ -80,8 +80,27 @@ public enum ErrorCode {
     MODULE_NOT_FOUND(11008, "模块不存在"),
     VOICE_CONFIG_READ_FAILED(11009, "读取语音服务配置失败"),
     VOICE_CONFIG_WRITE_FAILED(11010, "写入语音服务配置失败"),
-    VOICE_CONFIG_TEST_FAILED(11011, "语音服务连通性测试失败");
+    VOICE_CONFIG_TEST_FAILED(11011, "语音服务连通性测试失败"),
+
+    // ========== 用户模块错误 12xxx ==========
+    USER_NOT_FOUND(12001, "用户不存在"),
+    USERNAME_ALREADY_EXISTS(12002, "用户名已被注册"),
+    USER_PASSWORD_INCORRECT(12003, "用户名或密码错误"),
+    USER_NOT_LOGIN(12004, "请先登录"),
+    USER_TOKEN_INVALID(12005, "登录已失效，请重新登录"),
+    USER_TOKEN_EXPIRED(12006, "登录已过期，请重新登录"),
+
+    // ========== 营销对接错误 13xxx ==========
+    MARKET_DRAW_FAILED(13001, "抽奖失败，请稍后重试"),
+    MARKET_SERVICE_UNAVAILABLE(13002, "营销服务暂时不可用，请稍后重试"),
+    MARKET_SERVICE_TIMEOUT(13003, "营销服务响应超时，请稍后重试"),
+    MARKET_RESPONSE_ERROR(13004, "营销服务返回异常"),
+    MARKET_ACTIVITY_NOT_ARMORY(13005, "活动尚未开放，请稍后再试"),
+    MARKET_ACCOUNT_QUERY_FAILED(13006, "查询账户额度失败"),
+    MARKET_CREDIT_QUERY_FAILED(13007, "查询积分失败"),
+    MARKET_SIGN_REBATE_FAILED(13008, "签到返利失败");
 
     private final Integer code;
     private final String message;
 }
+

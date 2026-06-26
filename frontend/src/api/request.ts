@@ -25,6 +25,19 @@ const instance: AxiosInstance = axios.create({
   timeout: 60000,
 });
 
+// ========== 请求拦截器：注入 Authorization ==========
+instance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('auth_token');
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// ========== 响应拦截器 ==========
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object';
 }
@@ -103,13 +116,12 @@ async function getErrorFromResponseData(data: unknown): Promise<Error | null> {
   return new Error(result.message || '请求失败');
 }
 
-/**
- * 响应拦截器
- *
- * 后端约定：所有响应都是 HTTP 200 + Result
- * - code === 200 → 成功，返回 data
- * - code !== 200 → 失败，直接显示 message
- */
+/** 判断当前 URL 是否为登录/注册接口 */
+function isAuthEndpoint(url?: string): boolean {
+  if (!url) return false;
+  return url.endsWith('/api/auth/login') || url.endsWith('/api/auth/register');
+}
+
 instance.interceptors.response.use(
   (response) => {
     if (response.config.skipResultTransform) {
@@ -135,7 +147,16 @@ instance.interceptors.response.use(
   async (error) => {
     // 有响应的情况：后端返回了结果（即使是错误）
     if (error.response) {
-      const { data } = error.response;
+      const { data, config } = error.response;
+
+      // 401 未授权 → 清 token 跳登录（排除登录/注册接口的失败场景）
+      if (error.response.status === 401 && !isAuthEndpoint(config?.url)) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_user');
+        window.location.href = '/login';
+        return Promise.reject(new Error('登录已失效，请重新登录'));
+      }
+
       // 尝试解析 Result 格式
       const responseError = await getErrorFromResponseData(data);
       if (responseError) {
@@ -146,8 +167,6 @@ instance.interceptors.response.use(
     }
 
     // 没有响应的情况：真正的网络错误或连接被重置
-    // 对于文件上传，可能是网络超时或连接中断，但不一定是文件大小问题
-    // 让后端返回真实的错误信息，而不是在这里假设
     const config = error.config;
     const isUpload = config && (
       config.url?.includes('/upload') ||
@@ -155,12 +174,9 @@ instance.interceptors.response.use(
     );
 
     if (isUpload) {
-      // 文件上传失败且没有响应，可能是网络超时或连接中断
-      // 不直接假设是文件大小问题，返回更通用的错误信息
       return Promise.reject(new Error('上传失败，可能是网络超时或连接中断，请重试'));
     }
 
-    // 其他网络错误
     return Promise.reject(new Error('网络连接失败，请检查网络'));
   }
 );
@@ -191,14 +207,14 @@ export const request = {
    */
   upload<T>(url: string, formData: FormData, config?: AxiosRequestConfig): Promise<T> {
     return instance.post(url, formData, {
-      timeout: 300000, // 5分钟，与Nginx proxy_read_timeout对齐
+      timeout: 300000,
       headers: { 'Content-Type': 'multipart/form-data' },
       ...config,
     }).then(res => res.data);
   },
 
   /**
-   * 文件下载，自动识别后端以 Blob 形式返回的 Result.error
+   * 文件下载
    */
   async download(url: string, config?: AxiosRequestConfig): Promise<Blob> {
     const response = await instance.get<Blob>(url, {
@@ -210,7 +226,7 @@ export const request = {
   },
 
   /**
-   * 获取原始实例（用于特殊场景如下载 Blob）
+   * 获取原始实例
    */
   getInstance(): AxiosInstance {
     return instance;

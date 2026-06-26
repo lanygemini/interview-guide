@@ -1,9 +1,10 @@
 import {Link, Outlet, useLocation, useNavigate} from 'react-router-dom';
 import {motion} from 'framer-motion';
-import {Calendar, ChevronRight, Database, FileStack, MessageSquare, Moon, Settings, Sparkles, Sun, Users,} from 'lucide-react';
+import {Calendar, ChevronRight, Database, FileStack, Gift, MessageSquare, Moon, Settings, Sparkles, Sun, Users, LogOut} from 'lucide-react';
 import {useTheme} from '../hooks/useTheme';
 import {useState} from 'react';
 import UnifiedInterviewModal, {UnifiedInterviewConfig} from './UnifiedInterviewModal';
+import {useAuth} from '../hooks/useAuth';
 
 interface NavItem {
   id: string;
@@ -31,6 +32,8 @@ export default function Layout() {
     subtitle: string;
     startButtonText: string;
   } | null>(null);
+
+  const {user, logout} = useAuth();
 
   const openInterviewModalWithResume = (resumeId: number) => {
     setInterviewModalPreset({
@@ -104,6 +107,13 @@ export default function Layout() {
       title: '系统',
       items: [
         { id: 'settings', path: '/settings', label: '设置', icon: Settings, description: '管理模型和语音服务' },
+      ],
+    },
+    {
+      id: 'market',
+      title: '营销',
+      items: [
+        { id: 'raffle', path: '/raffle', label: '抽奖', icon: Gift, description: '每日签到和抽奖' },
       ],
     },
   ];
@@ -219,11 +229,29 @@ export default function Layout() {
         </nav>
 
         {/* 底部信息 */}
-        <div className="p-4 border-t border-slate-100 dark:border-slate-700">
-          <div className="px-3 py-2 bg-gradient-to-r from-primary-50 to-indigo-50 dark:from-primary-900/30 dark:to-slate-800 rounded-xl">
-            <p className="text-xs text-primary-600 dark:text-primary-400 font-medium">AI 面试助手 v1.0</p>
-            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Powered by AI</p>
-          </div>
+        <div className="p-4 border-t border-slate-100 dark:border-slate-700 space-y-2">
+          {user && (
+                <>
+                  <div className="px-3 py-2 bg-gradient-to-r from-primary-50 to-indigo-50 dark:from-primary-900/30 dark:to-slate-800 rounded-xl">
+                    <p className="text-xs text-primary-600 dark:text-primary-400 font-medium truncate">{user.nickname || user.username}</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">已登录</p>
+                  </div>
+                  <button
+                    onClick={logout}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-colors text-sm font-medium"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    退出登录
+                  </button>
+                </>
+              )
+            }
+            {!user && (
+              <div className="px-3 py-2 bg-gradient-to-r from-primary-50 to-indigo-50 dark:from-primary-900/30 dark:to-slate-800 rounded-xl">
+                <p className="text-xs text-primary-600 dark:text-primary-400 font-medium">AI 面试助手 v1.0</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Powered by AI</p>
+              </div>
+            )}
         </div>
       </aside>
 

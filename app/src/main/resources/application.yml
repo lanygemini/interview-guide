@@ -42,7 +42,7 @@ spring:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:interview_guide}
     username: ${POSTGRES_USER:postgres}
     # 与根目录 docker-compose.yml 中 postgres 服务默认一致（本地只起依赖容器 + bootRun 时无需改）
-    password: ${POSTGRES_PASSWORD:password}
+    password: ${POSTGRES_PASSWORD:123456}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -89,6 +89,24 @@ spring:
 
 # Application custom configuration
 app:
+  # JWT认证配置
+  auth:
+    jwt:
+      secret: ${APP_AUTH_JWT_SECRET:}            # 必填,至少32字节,启动 fail-fast 校验
+      expire-minutes: ${APP_AUTH_JWT_EXPIRE_MINUTES:1440}
+
+  # 大营销平台对接配置
+  market:
+    base-url: ${MARKET_BASE_URL:http://localhost:8098}   # 仅 host:port,/api/v1/raffle/activity 作为 client 内常量前缀
+    activity-id: ${MARKET_ACTIVITY_ID:100301}
+    connect-timeout-ms: ${MARKET_CONNECT_TIMEOUT_MS:3000}
+    read-timeout-ms: ${MARKET_READ_TIMEOUT_MS:8000}
+    activities:
+      - id: "100401"
+        name: "OpenAi抽奖活动"
+      - id: "100301"
+        name: "测试活动"
+
   ai:
     default-provider: dashscope
     default-embedding-provider: dashscope
@@ -298,3 +316,4 @@ management:
     health:
       probes:
         enabled: true
+
