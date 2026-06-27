@@ -1,6 +1,8 @@
 package interview.guide.modules.resume;
 
 import interview.guide.common.annotation.RateLimit;
+import interview.guide.common.quota.QuotaType;
+import interview.guide.common.quota.annotation.RequireQuota;
 import interview.guide.common.result.Result;
 import interview.guide.modules.resume.model.ResumeDetailDTO;
 import interview.guide.modules.resume.model.ResumeListItemDTO;
@@ -47,6 +49,7 @@ public class ResumeController {
      * @return 简历分析结果，包含评分和建议
      */
     @PostMapping(value = "/api/resumes/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @RequireQuota(QuotaType.DOCUMENT_ANALYZE)
     @RateLimit(dimension = RateLimit.Dimension.GLOBAL, count = 5)
     @RateLimit(dimension = RateLimit.Dimension.IP, count = 5)
     public Result<Map<String, Object>> uploadAndAnalyze(@RequestParam("file") MultipartFile file) {

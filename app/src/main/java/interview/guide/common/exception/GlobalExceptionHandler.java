@@ -1,5 +1,6 @@
 package interview.guide.common.exception;
 
+import interview.guide.common.quota.QuotaExceededException;
 import interview.guide.common.result.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,16 @@ public class GlobalExceptionHandler {
     
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
     
+    /**
+     * 处理额度不足异常
+     */
+    @ExceptionHandler(QuotaExceededException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public Result<Void> handleQuotaExceededException(QuotaExceededException e) {
+        log.warn("额度不足: type={}, message={}", e.getQuotaType(), e.getMessage());
+        return Result.error(e.getCode(), e.getMessage());
+    }
+
     /**
      * 处理业务异常
      */

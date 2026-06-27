@@ -1,6 +1,8 @@
 package interview.guide.modules.interview;
 
 import interview.guide.common.annotation.RateLimit;
+import interview.guide.common.quota.QuotaType;
+import interview.guide.common.quota.annotation.RequireQuota;
 import interview.guide.common.result.Result;
 import interview.guide.modules.interview.model.CreateInterviewRequest;
 import interview.guide.modules.interview.model.InterviewDetailDTO;
@@ -60,6 +62,7 @@ public class InterviewController {
      * 创建面试会话
      */
     @PostMapping("/api/interview/sessions")
+    @RequireQuota(QuotaType.INTERVIEW_COUNT)
     @RateLimit(dimension = RateLimit.Dimension.GLOBAL, count = 5)
     @RateLimit(dimension = RateLimit.Dimension.IP, count = 5)
     public Result<InterviewSessionDTO> createSession(@RequestBody CreateInterviewRequest request) {

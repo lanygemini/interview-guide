@@ -47,3 +47,12 @@ export interface ActivityInfo {
   id: string;
   name: string;
 }
+
+/** 用户额度信息 */
+export interface QuotaInfo {
+  type: string;
+  displayName: string;
+  remaining: number;
+  total: number;
+  used: number;
+}

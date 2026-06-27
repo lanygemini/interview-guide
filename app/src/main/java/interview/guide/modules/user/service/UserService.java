@@ -2,6 +2,7 @@ package interview.guide.modules.user.service;
 
 import interview.guide.common.exception.BusinessException;
 import interview.guide.common.exception.ErrorCode;
+import interview.guide.common.quota.service.QuotaService;
 import interview.guide.modules.user.model.LoginRequest;
 import interview.guide.modules.user.model.RegisterRequest;
 import interview.guide.modules.user.model.UserDTO;
@@ -23,6 +24,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final QuotaService quotaService;
 
     /**
      * 注册
@@ -40,6 +42,8 @@ public class UserService {
                 .build();
 
         entity = userRepository.save(entity);
+        // 新用户初始化默认额度
+        quotaService.initDefaultQuota(entity.getId());
         log.info("用户注册成功: id={}, username={}", entity.getId(), entity.getUsername());
         return toDTO(entity);
     }

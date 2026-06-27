@@ -98,7 +98,12 @@ public enum ErrorCode {
     MARKET_ACTIVITY_NOT_ARMORY(13005, "活动尚未开放，请稍后再试"),
     MARKET_ACCOUNT_QUERY_FAILED(13006, "查询账户额度失败"),
     MARKET_CREDIT_QUERY_FAILED(13007, "查询积分失败"),
-    MARKET_SIGN_REBATE_FAILED(13008, "签到返利失败");
+    MARKET_SIGN_REBATE_FAILED(13008, "签到返利失败"),
+
+    // ========== 额度模块错误 14xxx ==========
+    QUOTA_EXCEEDED(14001, "您的%s次数不足，请参与抽奖获取"),
+    QUOTA_NOT_FOUND(14002, "额度记录不存在"),
+    QUOTA_CALLBACK_INVALID(14003, "回调鉴权失败");
 
     private final Integer code;
     private final String message;

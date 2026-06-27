@@ -1,10 +1,15 @@
 import request from './request';
-import type { ActivityAccount, ActivityInfo, Award, CreditAccount, DrawResult, SignRebateResult, SkuProduct } from '../types/market';
+import type { ActivityAccount, ActivityInfo, Award, CreditAccount, DrawResult, QuotaInfo, SignRebateResult, SkuProduct } from '../types/market';
 
 export const marketApi = {
   /** 获取可选活动列表 */
   getActivities(): Promise<ActivityInfo[]> {
     return request.get<ActivityInfo[]>('/api/market/activities');
+  },
+
+  /** 获取用户额度 */
+  getQuota(): Promise<QuotaInfo[]> {
+    return request.get<QuotaInfo[]>('/api/market/quota');
   },
 
   /** 抽奖 */

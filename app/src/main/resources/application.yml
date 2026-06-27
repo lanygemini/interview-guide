@@ -106,6 +106,8 @@ app:
         name: "OpenAi抽奖活动"
       - id: "100301"
         name: "测试活动"
+      - id: "100501"
+        name: "面试次数抽奖活动"
 
   ai:
     default-provider: dashscope
@@ -211,6 +213,17 @@ app:
     api-call-attempt-timeout: ${APP_STORAGE_API_CALL_ATTEMPT_TIMEOUT:20s}
     auto-create-bucket: ${APP_STORAGE_AUTO_CREATE_BUCKET:true}
   
+  # 额度系统配置
+  quota:
+    defaults:
+      - type: interview_count
+        amount: 3
+      - type: document_analyze
+        amount: 5
+    callback:
+      app-id: big-market
+      app-token: 6ec604541f8b1ce4a
+
   # CORS配置 - React前端
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174,http://localhost:80,http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:80}

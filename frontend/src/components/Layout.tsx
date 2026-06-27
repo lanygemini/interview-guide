@@ -2,9 +2,11 @@ import {Link, Outlet, useLocation, useNavigate} from 'react-router-dom';
 import {motion} from 'framer-motion';
 import {Calendar, ChevronRight, Database, FileStack, Gift, MessageSquare, Moon, Settings, Sparkles, Sun, Users, LogOut} from 'lucide-react';
 import {useTheme} from '../hooks/useTheme';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import UnifiedInterviewModal, {UnifiedInterviewConfig} from './UnifiedInterviewModal';
 import {useAuth} from '../hooks/useAuth';
+import {marketApi} from '../api/market';
+import type {QuotaInfo} from '../types/market';
 
 interface NavItem {
   id: string;
@@ -34,6 +36,15 @@ export default function Layout() {
   } | null>(null);
 
   const {user, logout} = useAuth();
+  const [quotas, setQuotas] = useState<QuotaInfo[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      marketApi.getQuota().then(setQuotas).catch(() => {});
+    } else {
+      setQuotas([]);
+    }
+  }, [user]);
 
   const openInterviewModalWithResume = (resumeId: number) => {
     setInterviewModalPreset({
@@ -236,6 +247,20 @@ export default function Layout() {
                     <p className="text-xs text-primary-600 dark:text-primary-400 font-medium truncate">{user.nickname || user.username}</p>
                     <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">已登录</p>
                   </div>
+
+                  {quotas.length > 0 && (
+                    <div className="px-3 py-2 space-y-1.5">
+                      {quotas.map((q) => (
+                        <div key={q.type} className="flex items-center justify-between text-xs">
+                          <span className="text-slate-500 dark:text-slate-400">{q.displayName}</span>
+                          <span className={"font-medium " + (q.remaining > 0 ? "text-primary-600 dark:text-primary-400" : "text-red-500")}>
+                            {q.remaining}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   <button
                     onClick={logout}
                     className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-colors text-sm font-medium"

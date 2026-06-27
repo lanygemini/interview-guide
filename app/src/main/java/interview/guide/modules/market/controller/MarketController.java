@@ -4,6 +4,8 @@ import interview.guide.common.auth.CurrentUser;
 import interview.guide.common.auth.annotation.LoginUser;
 import interview.guide.common.auth.annotation.RequireLogin;
 import interview.guide.common.result.Result;
+import interview.guide.common.quota.model.QuotaDTO;
+import interview.guide.common.quota.service.QuotaService;
 import interview.guide.modules.market.model.ActivityAccountDTO;
 import interview.guide.modules.market.model.ActivityInfoDTO;
 import interview.guide.modules.market.model.AwardDTO;
@@ -35,11 +37,18 @@ import java.util.List;
 public class MarketController {
 
     private final MarketService marketService;
+    private final QuotaService quotaService;
 
     @GetMapping("/activities")
     public Result<List<ActivityInfoDTO>> getActivities() {
         List<ActivityInfoDTO> activities = marketService.getActivities();
         return Result.success(activities);
+    }
+
+    @GetMapping("/quota")
+    public Result<List<QuotaDTO>> getQuota(@LoginUser CurrentUser user) {
+        List<QuotaDTO> quotas = quotaService.getAllQuotas(user.id());
+        return Result.success(quotas);
     }
 
     @PostMapping("/draw")
